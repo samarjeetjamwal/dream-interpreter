@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dream Translator: AI-Powered Symbol Decoder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-light: #6366F1;
+      --primary-dark: #4338CA;
+      --secondary: #EC4899;
+      --dark: #111827;
+      --darker: #0F172A;
+      --light: #F9FAFB;
+      --gray: #6B7280;
+      --gray-light: #E5E7EB;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius: 1rem;
+      --radius-lg: 1.5rem;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-button: all 0.25s ease;
+      --gradient-primary: linear-gradient(135deg, #4F46E5, #7C3AED);
+      --gradient-secondary: linear-gradient(135deg, #EC4899, #F97316);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #1e293b 0%, #3730a3 50%, #0f172a 100%);
+      color: var(--light);
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 0;
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding: 3rem 1rem;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #EEF2FF, #FECDD3, #DBEAFE);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      color: #E0E7FF;
+      font-size: 1.25rem;
+      max-width: 700px;
+      margin: 0 auto;
+      font-weight: 400;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px 2px 0 0;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 30px -10px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      gap: 0.75rem;
+    }
+
+    .card-header svg {
+      color: var(--primary-light);
+    }
+
+    .card-header h2 {
+      font-size: 1.75rem;
+      color: #E0E7FF;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.8rem;
+      color: #E0E7FF;
+      font-weight: 500;
+      font-size: 1.05rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.8rem;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 0.75rem;
+      font-size: 1.05rem;
+      transition: var(--transition);
+      font-family: inherit;
+      background: rgba(15, 23, 42, 0.5);
+      color: white;
+      resize: vertical;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    textarea {
+      min-height: 160px;
+      line-height: 1.6;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 0.95rem 2.2rem;
+      font-size: 1.1rem;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition-button);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+      font-family: inherit;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 15px rgba(79, 70, 229, 0.4);
+      background: linear-gradient(135deg, #5850EC, #8B5CF6);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    .secondary-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    #result {
+      color: #E2E8F0;
+      line-height: 1.9;
+      font-size: 1.08rem;
+      padding: 0.5rem 0;
+      min-height: 60px;
+    }
+
+    .api-key-container {
+      margin-bottom: 1.8rem;
+      position: relative;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: #E0E7FF;
+      font-style: normal;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-top: 4px solid var(--primary-light);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: #94A3B8;
+      font-size: 0.95rem;
+      padding: 2.5rem 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    footer a {
+      color: var(--primary-light);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.2rem;
+      margin: 1.8rem 0;
+    }
+
+    .feature-item {
+      background: rgba(59, 73, 123, 0.3);
+      padding: 1.2rem;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition);
+    }
+
+    .feature-item:hover {
+      transform: translateY(-4px);
+      background: rgba(79, 70, 229, 0.2);
+      border-color: rgba(79, 70, 229, 0.3);
+    }
+
+    .feature-item strong {
+      display: block;
+      color: #F9FAFB;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      font-size: 1.1rem;
+    }
+
+    .feature-item span {
+      color: #E0E7FF;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1rem;
+      }
+      header h1 {
+        font-size: 2.5rem;
+      }
+      header p {
+        font-size: 1.1rem;
+      }
+      .card {
+        padding: 1.8rem;
+      }
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+      .feature-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Animation for reveal */
+    .card {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .example-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--primary-light);
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+    }
+
+    .example-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .highlight {
+      background: linear-gradient(90deg, rgba(79, 70, 229, 0.2), rgba(236, 72, 153, 0.2));
+      padding: 0.2em 0.4em;
+      border-radius: 0.5em;
+      font-weight: 600;
+    }
+
+    .powered-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .powered-badge svg {
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Dream Translator</h1>
+      <p>Decode the hidden language of your dreams with advanced AI analysis from Jungian, cultural, and psychological perspectives.</p>
+    </header>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <strong>Jungian</strong>
+        <span>Archetypes & Collective Unconscious</span>
+      </div>
+      <div class="feature-item">
+        <strong>Cultural</strong>
+        <span>Mythological & Cross-Cultural Symbols</span>
+      </div>
+      <div class="feature-item">
+        <strong>Emotional</strong>
+        <span>Personal Context & Feeling States</span>
+      </div>
+      <div class="feature-item">
+        <strong>AI-Powered</strong>
+        <span>Gemini 2.0 Flash Deep Analysis</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        <h2>Input Dream & API Key</h2>
+      </div>
+
+      <div class="input-group">
+        <label for="dreamInput">🌙 Describe Your Dream</label>
+        <textarea 
+          id="dreamInput" 
+          placeholder="e.g., I was walking through a foggy forest holding a lantern. I saw a door in a tree and felt both curiosity and fear as I reached for the handle..."
+        ></textarea>
+        <button class="example-btn" type="button" onclick="fillExample()">Use Example Dream</button>
+      </div>
+
+      <div class="button-group">
+        <button onclick="analyzeDream()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg>
+          Decode My Dream
+        </button>
+        <button class="secondary-btn" type="button" onclick="clearAll()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"></path><path d="M10 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"></path><path d="M10 8V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4"></path><path d="M18 16v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1"></path><path d="M18 8V7a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v1"></path></svg>
+        <h2>Dream Interpretation</h2>
+      </div>
+      <div id="result">Your personalized dream analysis will appear here...</div>
+    </div>
+
+    <footer>
+      <p class="powered-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+        Dream Translator © 2025 | Created By Samar Jeet Jamwal | Powered by Google's <span class="highlight">Gemini 2.0 Flash</span>
+      </p>
+      <p style="margin-top: 0.7rem;">All processing happens client-side. Your dreams remain private and secure.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Pre-configured API key
+    const API_KEY = "AIzaSyAAXhwcVWyjeoYGO6mAI_Edy3H0dyU0bnk";
+
+    function fillExample() {
+      document.getElementById('dreamInput').value = `I was flying over a vast ocean under a full moon, holding an old key. I felt both free and anxious. Suddenly, the key began to melt in my hand, and I woke up just before touching the water.`;
+    }
+
+    function clearAll() {
+      document.getElementById('dreamInput').value = '';
+      document.getElementById('result').innerHTML = 'Your personalized dream analysis will appear here...';
+    }
+
+    async function analyzeDream() {
+      const dreamText = document.getElementById('dreamInput').value.trim();
+      const resultDiv = document.getElementById('result');
+      const analyzeBtn = document.getElementById('analyzeBtn');
+
+      if (!dreamText) {
+        alert("💭 Please describe your dream in the text box above.");
+        return;
+      }
+
+      // Show loading state
+      resultDiv.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Interpreting your dream through Jungian, cultural, and emotional lenses...</p>
+          <p style="font-size: 0.95rem; opacity: 0.8;">Advanced analysis powered by Gemini 2.0 Flash</p>
+        </div>
+      `;
+      
+      document.querySelectorAll('button').forEach(b => b.disabled = true);
+
+      const prompt = `
+You are a world-class dream analyst with expertise in Jungian psychology, cultural symbolism, and modern emotional intelligence. Analyze the following dream with depth, empathy, and precision.
+
+Dream Description: "${dreamText}"
+
+Provide a structured, insightful interpretation in this exact format:
+
+**Core Emotional Theme**: [Identify the central emotional journey: e.g., "The tension between liberation and responsibility"]
+
+**Symbol Breakdown**:
+List each major symbol and interpret it through three lenses:
+- **[Symbol]**:
+  • Jungian: [Archetypal meaning – e.g., Shadow, Anima, Self, etc.]
+  • Cultural: [Cross-cultural or mythological significance]
+  • Emotional: [What it likely represents in the dreamer's current waking life]
+
+**Narrative Arc**: [Briefly explain how the dream unfolds as a psychological story – beginning, turning point, climax, resolution (or lack thereof)]
+
+**Integration Insight**: [Offer a compassionate, non-prescriptive reflection on what this dream might be inviting the dreamer to notice, heal, or embrace in their life. Avoid clichés.]
+
+**Personalized Dream Dictionary Entry**:
+Create one concise, poetic definition as if for a dreamer's personal journal:
+"[Symbol]" – [A beautiful, insightful one-sentence definition that captures its essence in this dream]
+
+Ensure the tone is wise, warm, and illuminating – like a trusted guide. Use rich but accessible language. Never trivialize the dream.
+`;
+
+      try {
+        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + API_KEY, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: prompt }]
+            }],
+            safetySettings: [
+              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
+            ],
+            generationConfig: {
+              temperature: 0.85,
+              topP: 0.95,
+              topK: 40,
+              maxOutputTokens: 1200
+            }
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          let errorMsg = "Error: " + (data.error.message || "Unknown error");
+          if (data.error.code === 401) {
+            errorMsg = "🔐 Authentication failed. Please contact the administrator.";
+          } else if (data.error.code === 429) {
+            errorMsg = "⏳ Rate limit exceeded. Please wait a moment before trying again.";
+          }
+          resultDiv.innerHTML = `<p style="color: #F87171; line-height: 1.6;">${errorMsg}</p>`;
+        } else {
+          const aiText = data.candidates[0].content.parts[0].text;
+          // Preserve markdown-style formatting
+          const formattedText = aiText
+            .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #E0E7FF;">$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n•/g, '\n  •')
+            .replace(/\n/g, '<br>')
+            .replace(/__(.*?)__/g, '<strong style="color: #E0E7FF;">$1</strong>');
+          resultDiv.innerHTML = `<p style="color: #E2E8F0;">${formattedText}</p>`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <p style="color: #F87171;">
+            🌐 Network error: Unable to connect to Gemini API.<br>
+            Please check your internet connection.
+          </p>
+        `;
+      } finally {
+        document.querySelectorAll('button').forEach(b => b.disabled = false);
+      }
+    }
+
+    // Allow pressing Ctrl+Enter to trigger analysis
+    document.getElementById('dreamInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        e.preventDefault();
+        analyzeDream();
+      }
+    });
+  </script>
+</body>
+</html>
